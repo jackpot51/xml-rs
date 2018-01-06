@@ -526,6 +526,17 @@ impl PullParser {
             None => return Some(self_error!(self; "Element {} prefix is unbound", name))
         }
 
+        // Hack to handle OFX's non-terminated tags
+        loop {
+            let op_name = self.est.pop().unwrap();
+
+            if name == op_name {
+                self.pop_namespace = true;
+                return self.into_state_emit(State::OutsideTag, Ok(XmlEvent::EndElement { name: name }));
+            }
+        }
+
+        /*
         let op_name = self.est.pop().unwrap();
 
         if name == op_name {
@@ -534,6 +545,7 @@ impl PullParser {
         } else {
             Some(self_error!(self; "Unexpected closing tag: {}, expected {}", name, op_name))
         }
+        */
     }
 
 }
