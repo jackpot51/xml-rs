@@ -68,7 +68,16 @@ impl PullParser {
                 }
             }
 
-            _ => Some(self_error!(self; "Unexpected token inside an entity: {}", t))
+            Token::Whitespace(c) => {
+                // Hack for OFX having & unescaped
+                self.buf.push('&');
+                self.buf.push_str(&self.data.take_ref_data());
+                self.buf.push(c);
+                self.inside_whitespace = true;
+                self.into_state_continue(prev_st)
+            }
+
+            _ => Some(self_error!(self; "Unexpected token inside an entity: {:?}", t))
         }
     }
 }
