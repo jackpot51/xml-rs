@@ -72,6 +72,16 @@ impl<W: Write> EventWriter<W> {
         }
     }
 
+    /// Returns a mutable reference to the underlying `Writer`.
+    ///
+    /// Note that having a reference to the underlying sink makes it very easy to emit invalid XML
+    /// documents. Use this method with care. Valid use cases for this method include accessing
+    /// methods like `Write::flush`, which do not emit new data but rather change the state
+    /// of the stream itself.
+    pub fn inner_mut(&mut self) -> &mut W {
+        &mut self.sink
+    }
+
     /// Unwraps this `EventWriter`, returning the underlying writer.
     ///
     /// Note that this is a destructive operation: unwrapping a writer and then wrapping
